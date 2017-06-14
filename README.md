@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/larissaleite/reddit-crawler.png)](https://travis-ci.org/larissaleite/reddit-crawler)
+
 # reddit-crawler
 
 1. Run `pip install -r requirements.txt`
