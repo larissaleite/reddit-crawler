@@ -5,3 +5,4 @@ env/
 *$py.class
 *.db
 .Python
+@*

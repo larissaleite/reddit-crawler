@@ -58,7 +58,7 @@ def get_submission_comments(submission_id, comments_url):
     url_params = comments_url+".json"
     data = request_reddit_data(url_params)
 
-    #ignore first cause it's the submission itself
+    #ignores the submission itself
     data = data[1]
     comments = data['data']['children']
 
@@ -105,7 +105,7 @@ def get_user_info(username):
 
         user = (username, comment_karma, post_karma)
         return user
-    except KeyError: # catches errors for example when user is deleted but the post is still there
+    except KeyError: # catches errors for example when user was deleted
         return "Invalid username"
 
 def get_user_posts(username):
