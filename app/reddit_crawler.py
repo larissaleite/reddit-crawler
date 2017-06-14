@@ -6,7 +6,6 @@ BASE_URL = 'https://www.reddit.com/'
 usernames = set()
 
 def request_reddit_data(url):
-    print url
     response = requests.get(BASE_URL+url, headers = {'User-agent': 'lari_py_test'})
     data = response.json()
     return data
@@ -24,7 +23,6 @@ def get_subreddit_pages(subreddit, pages):
 
     db.save_submissions(all_submissions)
     db.save_submissions_comments(all_submissions_comments)
-
 
 def get_submissions_subreddit(url_params, all_submissions, all_submissions_comments):
     data = request_reddit_data(url_params)['data']
@@ -124,7 +122,6 @@ def get_user_posts(username):
 
     return all_user_submissions
 
-
 def get_posts_user_commented(username):
     all_user_comments = []
 
@@ -144,6 +141,8 @@ if __name__ == '__main__':
 
     try:
         pages = int(sys.argv[1])
+        if pages < 0: raise ValueError
+
         get_subreddit_pages('Python', pages)
     except (IndexError, ValueError):
         print "A valid number of pages needs to be passed as parameter"
