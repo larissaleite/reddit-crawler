@@ -1,4 +1,4 @@
-import sqlite_db, json
+import sqlite_db as db, json
 from flask import Flask, jsonify, request
 
 app = Flask (__name__)
@@ -16,7 +16,7 @@ def get_submissions():
 		if order_by != 'num_comments' and order_by != 'punctuation':
 			return status_400("Invalid value for parameter: order_by. Valid values: num_comments, punctuation")
 
-		return json.dumps(sqlite_db.get_submissions(type, order_by))
+		return json.dumps(db.get_submissions(type, order_by))
 	else:
 		return status_400("Parameter required: order_by")
 
@@ -25,9 +25,9 @@ def get_users():
 	if 'order_by' in request.args:
 		order_by = request.args.get('order_by')
 
-		if order_by == 'num_comments': return json.dumps(sqlite_db.get_top_commenters())
-		if order_by == 'num_submissions': return json.dumps(sqlite_db.get_top_submitters())
-		if order_by == 'value' : return json.dumps(sqlite_db.get_most_valued_users())
+		if order_by == 'num_comments': return json.dumps(db.get_top_commenters())
+		if order_by == 'num_submissions': return json.dumps(db.get_top_submitters())
+		if order_by == 'value' : return json.dumps(db.get_most_valued_users())
 
 		return status_400("Invalid value for parameter: order_by. Valid values: num_comments, num_submissions, value")
 	else:
@@ -35,13 +35,15 @@ def get_users():
 
 @app.route('/api/users/<username>/submissions', methods=['GET'])
 def get_submissions_by_user(username):
-	submissions = sqlite_db.get_submissions_by_submitter(username)
+	submissions = db.get_submissions_by_submitter(username)
 	return json.dumps(submissions)
 
-@app.route('/api/users/<username>/comments/submissions', methods=['GET'])
+@app.route('/api/users/<username>/comments/parent_submission', methods=['GET'])
 def get_submissions_commented_by_user(username):
-	submissions = sqlite_db.get_submissions_commented_by_user(username)
+	submissions = db.get_submissions_commented_by_user(username)
 	return json.dumps(submissions)
 
 if __name__ == "__main__":
+	db.create_schema_db()
+
 	app.run()
