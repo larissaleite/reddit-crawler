@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS comments (
     submission_id VARCHAR(64),
     user VARCHAR(64) not null,
     text TEXT NOT NULL,
-    punctuation INT(11) NOT NULL
+    punctuation INT(11)
 );
 
 CREATE TABLE IF NOT EXISTS users (

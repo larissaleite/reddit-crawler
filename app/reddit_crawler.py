@@ -5,7 +5,7 @@ from defaults import BASE_URL, DEFAULT_DB, DEFAULT_HOST, DEFAULT_USER, DEFAULT_S
 usernames = set()
 
 def request_reddit_data(url):
-    response = requests.get(BASE_URL+url, headers = {'User-agent': 'lari_py_test'})
+    response = requests.get(BASE_URL+url, headers = {'User-agent': 'reddit-crawler-mysql-py'})
     data = response.json()
     return data
 
@@ -16,12 +16,21 @@ def get_subreddit_pages(subreddit, pages):
     next_page = str()
     for page in range(0, pages):
         next_page = get_submissions_subreddit("r/"+subreddit+"/.json?"+next_page, all_submissions, all_submissions_comments)
+        
+        print("Page %s: writing %s submissions and %s comments" % (page, len(all_submissions), len(all_submissions_comments)))
+        db.save_submissions(all_submissions)
+        db.save_submissions_comments(all_submissions_comments)
+        all_submissions = []
+        all_submissions_comments = []
+        if next_page == "no_pages_remaining": 
+            print("Subreddit less than %s pages" % str(pages))
+            break
 
+    print("Getting user info...")
     all_users_info = get_all_users_info()
+    print("Writing %s users" % len(all_users_info))
     db.save_users(all_users_info)
 
-    db.save_submissions(all_submissions)
-    db.save_submissions_comments(all_submissions_comments)
 
 def get_submissions_subreddit(url_params, all_submissions, all_submissions_comments):
     data = request_reddit_data(url_params)['data']
@@ -49,7 +58,10 @@ def get_submissions_subreddit(url_params, all_submissions, all_submissions_comme
 
         usernames.add(submitter)
 
-    next_page = "after="+data['after']
+    try:
+        next_page = "after="+data['after']
+    except TypeError:
+        next_page = "no_pages_remaining"
     return next_page
 
 def get_submission_comments(submission_id, comments_url):
@@ -74,7 +86,7 @@ def get_comments_data(comments, all_comments, submission_id):
         parent_id = comment['parent_id']
         user = comment['author'] if 'author' in comment else ''
         text = comment['body'] if 'body' in comment else ''
-        punctuation = comment['score'] if 'score' in comment else ''
+        punctuation = comment['score'] if 'score' in comment else None
 
         all_comments.append((comment_id, parent_id, submission_id, user, text, punctuation))
 

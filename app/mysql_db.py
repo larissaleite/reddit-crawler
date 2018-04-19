@@ -41,8 +41,10 @@ class MySQLDatabase(object):
         with open(DATABASE_DIR+'schema.sql', mode='r') as schema_script:
             query = " ".join(schema_script.readlines())
         for command in query.split(";"):
-            c = command.replace("\n", " ").replace("NOT EXISTS ", "NOT EXISTS %s_" % self.table).replace("ALTER TABLE ", "ALTER TABLE %s_" % self.table)
-            if c: 
+            c = " ".join(command.split())
+            c = c.replace("NOT EXISTS ", "NOT EXISTS %s_" % self.table).replace("ALTER TABLE ", "ALTER TABLE %s_" % self.table)
+            if c:
+                print(c)
                 self.connection.cursor().execute(c)
 
     def save_submissions(self, submissions):
