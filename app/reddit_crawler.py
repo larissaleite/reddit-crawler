@@ -39,8 +39,9 @@ def get_submissions_subreddit(url_params, all_submissions, all_submissions_comme
         punctuation = submission['score']
         num_comments = submission['num_comments']
         created_date = submission['created']
+        text = submission['selftext']
 
-        submission = (submission_id, title, submitter, discussion_url, url, punctuation, num_comments, created_date)
+        submission = (submission_id, title, text, submitter, discussion_url, url, punctuation, num_comments, created_date)
 
         all_submissions.append(submission)
 
@@ -148,9 +149,9 @@ if __name__ == '__main__':
     parser.add_argument('-u', '--user', dest='user', default=DEFAULT_USER, 
         help='MySQL username. Default: %s' % (DEFAULT_USER))
     parser.add_argument('-s', '--subreddit', dest='subreddit', default=DEFAULT_SUB_REDDIT, 
-        help='. Default: %s' % (DEFAULT_SUB_REDDIT))
+        help='Name of subreddit to search. Default: %s' % (DEFAULT_SUB_REDDIT))
     parser.add_argument('-p', '--pages', dest='pages', default=DEFAULT_PAGES, type=int,
-        help='. Default: %s' % (DEFAULT_PAGES))
+        help='Number of pages to search. Default: %s' % (DEFAULT_PAGES))
 
     args = parser.parse_args()
 

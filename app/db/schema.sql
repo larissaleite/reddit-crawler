@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS submissions (
   id VARCHAR(64) PRIMARY KEY,
   title TEXT NOT NULL,
+  text TEXT NOT NULL,
   submitter VARCHAR(128) NULL,
   discussion_url VARCHAR(160),
   url VARCHAR(160) NOT NULL,
@@ -15,9 +16,7 @@ CREATE TABLE IF NOT EXISTS comments (
     submission_id VARCHAR(64),
     user VARCHAR(64) not null,
     text TEXT NOT NULL,
-    punctuation INT(11) NOT NULL,
-    FOREIGN KEY(submission_id) REFERENCES submissions(id),
-    FOREIGN KEY(parent_id) REFERENCES comments(id)
+    punctuation INT(11) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS users (

@@ -2,7 +2,7 @@ import getpass, os
 
 # reddit defaults
 BASE_URL = 'https://www.reddit.com/'
-DEFAULT_PAGES = 10
+DEFAULT_PAGES = 1
 DEFAULT_SUB_REDDIT = 'Python'
 
 # mysql defaults

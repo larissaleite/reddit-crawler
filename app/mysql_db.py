@@ -47,7 +47,7 @@ class MySQLDatabase(object):
 
     def save_submissions(self, submissions):
         insert_submissions = """insert ignore into %s_submissions""" % self.table
-        insert_submissions += """(id, title, submitter, discussion_url, url, punctuation, num_comments, created_date) values(%s, %s, %s, %s, %s, %s, %s, %s)"""
+        insert_submissions += """(id, title, text, submitter, discussion_url, url, punctuation, num_comments, created_date) values(%s, %s, %s, %s, %s, %s, %s, %s, %s)"""
         self.connection.cursor().executemany(insert_submissions, submissions)
         self.connection.commit()
 
