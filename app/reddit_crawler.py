@@ -1,7 +1,6 @@
-import requests, sys
-import sqlite_db as db
-
-BASE_URL = 'https://www.reddit.com/'
+import requests, sys, argparse
+from mysql_db import MySQLDatabase
+from defaults import BASE_URL, DEFAULT_DB, DEFAULT_HOST, DEFAULT_USER, DEFAULT_SUB_REDDIT, DEFAULT_PAGES, DEFAULT_TABLE_PREFIX
 
 usernames = set()
 
@@ -72,16 +71,16 @@ def get_comments_data(comments, all_comments, submission_id):
 
         comment_id = comment['id']
         parent_id = comment['parent_id']
-        user = comment['author']
-        text = comment['body']
-        punctuation = comment['score']
+        user = comment['author'] if 'author' in comment else ''
+        text = comment['body'] if 'body' in comment else ''
+        punctuation = comment['score'] if 'score' in comment else ''
 
         all_comments.append((comment_id, parent_id, submission_id, user, text, punctuation))
 
         usernames.add(user)
 
         # recursively gets nested replies
-        if comment['replies'] != "":
+        if 'replies' in comment and comment['replies'] != "":
             replies = comment['replies']['data']['children']
             get_comments_data(replies, all_comments, submission_id)
 
@@ -93,11 +92,10 @@ def get_all_users_info():
     return users
 
 def get_user_info(username):
-    url_params = "user/"+username+"/about.json"
-
-    user_info = request_reddit_data(url_params)
-
     try:
+        url_params = "user/"+username+"/about.json"
+        user_info = request_reddit_data(url_params)
+
         user_info = user_info['data']
 
         comment_karma = user_info['comment_karma']
@@ -105,7 +103,7 @@ def get_user_info(username):
 
         user = (username, comment_karma, post_karma)
         return user
-    except KeyError: # catches errors for example when user was deleted
+    except (TypeError, KeyError): # catches errors for example when user was deleted
         return "Invalid username"
 
 def get_user_posts(username):
@@ -137,12 +135,39 @@ def get_posts_user_commented(username):
     return all_user_comments
 
 if __name__ == '__main__':
+
+    # parse arguments
+    parser = argparse.ArgumentParser(description='Collect data from Reddit and store in MySQL')
+    
+    parser.add_argument('-d', '--database', dest='db_name', default=DEFAULT_DB, 
+        help='MySQL database where tweets will be stored. Default: %s' % (DEFAULT_DB))
+    parser.add_argument('-t', '--table_prefix', dest='table_prefix', default=DEFAULT_TABLE_PREFIX, 
+        help='String to be added to beginning of MySQL table names. Default: %s' % (DEFAULT_TABLE_PREFIX))
+    parser.add_argument('-H', '--host', dest='host', default=DEFAULT_HOST, 
+        help='MySQL host. Default: %s' % (DEFAULT_HOST))
+    parser.add_argument('-u', '--user', dest='user', default=DEFAULT_USER, 
+        help='MySQL username. Default: %s' % (DEFAULT_USER))
+    parser.add_argument('-s', '--subreddit', dest='subreddit', default=DEFAULT_SUB_REDDIT, 
+        help='. Default: %s' % (DEFAULT_SUB_REDDIT))
+    parser.add_argument('-p', '--pages', dest='pages', default=DEFAULT_PAGES, type=int,
+        help='. Default: %s' % (DEFAULT_PAGES))
+
+    args = parser.parse_args()
+
+    if not args.db_name:
+        print("Must supply a databse name via -d or --database.")
+        sys.exit(1)
+
+    if int(args.pages) < 0:
+        print("Page number most be non-negative.")
+        sys.exit(1)
+
+    if not args.table_prefix:
+        print("Table prefix set to %s" % args.subreddit.lower())
+        args.table_prefix = args.subreddit.lower()
+
+    db = MySQLDatabase(db_name=args.db_name, table=args.table_prefix, host=args.host, user=args.user)
     db.create_schema_db()
 
-    try:
-        pages = int(sys.argv[1])
-        if pages < 0: raise ValueError
-
-        get_subreddit_pages('Python', pages)
-    except (IndexError, ValueError):
-        print "A valid number of pages needs to be passed as parameter"
+    get_subreddit_pages(args.subreddit, int(args.pages))
+    
