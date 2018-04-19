@@ -8,14 +8,21 @@ Fork of [reddit-crawler](https://github.com/larissaleite/reddit-crawler):
 
 ## Installation
 
-1. Run `pip install -r requirements.txt`
-2. To collect data from reddit run `python app/reddit_crawler.py -d <database> -s <subreddit>`
-3. To start the API run `python app/rest_api.py`
-4. API calls on `localhost:5000`:
-    * `/api/submissions?order_by=num_comments,punctuation>&type=external,internal`
-    * `/api/users/{username}/submissions`
-    * `/api/users/{username}/comments/parent_submission`
-    * `/api/users?order_by=num_comments/num_submissions/value`
+Run `pip install -r requirements.txt`
+
+## Examples
+
+Collect 1 page of data from the "Python" subreddit and put in the MySQL tables `code`. MySQL table names begin with `python_`.
+
+```bash
+python reddit_crawler.py -d code -s python
+```
+
+Collect 10 pages of data from the "The_Donald" subreddit and put in the MySQL database `politics`. MySQL table names begin with `repub_`.
+
+```bash
+python reddit_crawler.py -d politics -t repub -p 10 -s the_donald
+```
 
 ## Usage
 
@@ -35,12 +42,12 @@ optional arguments:
   -H HOST, --host HOST  MySQL host. Default: localhost
   -u USER, --user USER  MySQL username. Default: sgiorgi
   -s SUBREDDIT, --subreddit SUBREDDIT
-                        . Default: Python
+                        Name of subreddit to search. Default: Python
   -p PAGES, --pages PAGES
-                        . Default: 10
+                        Number of pages to search. Default: 10
 ```
 
 ## Dependencies
-- [mysqlclient](https://github.com/PyMySQL/mysqlclient-python)
+- [MySQLdb](http://mysql-python.sourceforge.net/MySQLdb.html)
 - argparse
 - requests
