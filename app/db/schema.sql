@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS submissions (
-  id VARCHAR(64) PRIMARY KEY,
+  message_id VARCHAR(64) PRIMARY KEY,
   title TEXT NOT NULL,
-  text TEXT NOT NULL,
-  submitter VARCHAR(128) NULL,
+  message TEXT NOT NULL,
+  user VARCHAR(128) NULL,
   discussion_url VARCHAR(160),
   url VARCHAR(160) NOT NULL,
   punctuation INT(11),
@@ -11,11 +11,11 @@ CREATE TABLE IF NOT EXISTS submissions (
 );
 
 CREATE TABLE IF NOT EXISTS comments (
-    id VARCHAR(64) PRIMARY KEY,
+    message_id VARCHAR(64) PRIMARY KEY,
     parent_id VARCHAR(64),
     submission_id VARCHAR(64),
-    user VARCHAR(64) not null,
-    text TEXT NOT NULL,
+    user VARCHAR(128) not null,
+    message TEXT NOT NULL,
     punctuation INT(11)
 );
 

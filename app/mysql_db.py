@@ -49,18 +49,18 @@ class MySQLDatabase(object):
 
     def save_submissions(self, submissions):
         insert_submissions = """insert ignore into %s_submissions""" % self.table
-        insert_submissions += """(id, title, text, submitter, discussion_url, url, punctuation, num_comments, created_date) values(%s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+        insert_submissions += """(message_id, title, message, user, discussion_url, url, punctuation, num_comments, created_date) values(%s, %s, %s, %s, %s, %s, %s, %s, %s)"""
         self.connection.cursor().executemany(insert_submissions, submissions)
         self.connection.commit()
 
     def get_submission_by_id(self, id):
-        return self.connection.cursor().execute("select * from %s_submissions where id = %s;", (self.table, id,)).fetchall()
+        return self.connection.cursor().execute("select * from %s_submissions where message_id = %s;", (self.table, id,)).fetchall()
 
     def get_submissions_by_submitter(self, submitter):
-        return self.connection.cursor().execute("select * from %s_submissions where submitter = %s;", (self.table, submitter,)).fetchall()
+        return self.connection.cursor().execute("select * from %s_submissions where user = %s;", (self.table, submitter,)).fetchall()
 
     def get_submissions_commented_by_user(self, user):
-        return self.connection.cursor().execute("select * from %s_submissions where id in (select submission_id from comments where user = %s);", (self.table, user,)).fetchall()
+        return self.connection.cursor().execute("select * from %s_submissions where message_id in (select submission_id from comments where user = %s);", (self.table, user,)).fetchall()
 
     def get_submissions(self, type, order_by):
         query = "select * from %s_submissions" % self.table
@@ -76,12 +76,12 @@ class MySQLDatabase(object):
 
     def save_submissions_comments(self, comments):
         insert_comments = """insert ignore into %s_comments""" % self.table
-        insert_comments += """(id, parent_id, submission_id, user, text, punctuation) values(%s, %s, %s, %s, %s, %s)"""
+        insert_comments += """(message_id, parent_id, submission_id, user, message, punctuation) values(%s, %s, %s, %s, %s, %s)"""
         self.connection.cursor().executemany(insert_comments, comments)
         self.connection.commit()
 
     def get_top_submitters(self, limit=DEF_LIMIT):
-        return self.connection.cursor().execute("select submitter from submissions group by %s_submitter order by count(*) desc limit %s;" % (self.table, limit)).fetchall()
+        return self.connection.cursor().execute("select user from submissions group by %s_submitter order by count(*) desc limit %s;" % (self.table, limit)).fetchall()
 
     def get_top_commenters(self, limit=DEF_LIMIT):
         return self.connection.cursor().execute("select user from %s_comments group by user order by count(*) desc limit %s;" % (self.table, limit)).fetchall()

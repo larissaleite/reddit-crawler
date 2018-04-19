@@ -17,7 +17,7 @@ def get_subreddit_pages(subreddit, pages):
     for page in range(0, pages):
         next_page = get_submissions_subreddit("r/"+subreddit+"/.json?"+next_page, all_submissions, all_submissions_comments)
         
-        print("Page %s: writing %s submissions and %s comments" % (page, len(all_submissions), len(all_submissions_comments)))
+        print("Page %s: writing %s submissions and %s comments from %s users" % (page, len(all_submissions), len(all_submissions_comments), len(usernames)))
         db.save_submissions(all_submissions)
         db.save_submissions_comments(all_submissions_comments)
         all_submissions = []
