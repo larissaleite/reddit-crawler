@@ -40,7 +40,7 @@ optional arguments:
                         String to be added to beginning of MySQL table names.
                         Default:
   -H HOST, --host HOST  MySQL host. Default: localhost
-  -u USER, --user USER  MySQL username. Default: sgiorgi
+  -u USER, --user USER  MySQL username. Default: 
   -s SUBREDDIT, --subreddit SUBREDDIT
                         Name of subreddit to search. Default: Python
   -p PAGES, --pages PAGES
