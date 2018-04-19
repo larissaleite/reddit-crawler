@@ -12,7 +12,7 @@ Run `pip install -r requirements.txt`
 
 ## Examples
 
-Collect 1 page of data from the "Python" subreddit and put in the MySQL tables `code`. MySQL table names begin with `python_`.
+Collect 1 page of data from the "Python" subreddit and put in the MySQL database `code`. MySQL table names begin with `python_`.
 
 ```bash
 python reddit_crawler.py -d code -s python
