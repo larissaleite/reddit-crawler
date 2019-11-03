@@ -69,6 +69,8 @@ def get_submission_comments(submission_id, comments_url):
 def get_comments_data(comments, all_comments, submission_id):
     for comment in comments:
         comment = comment['data']
+        if 'author' not in comment:
+            continue
 
         comment_id = comment['id']
         parent_id = comment['parent_id']
