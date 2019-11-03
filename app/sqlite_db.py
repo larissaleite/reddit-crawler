@@ -10,51 +10,65 @@ def create_schema_db():
     db.commit()
 
 def save_submissions(submissions):
-    insert_submissions = 'insert or ignore into submissions(id, title, submitter, discussion_url, url, punctuation, num_comments, created_date) values(?, ?, ?, ?, ?, ?, ?, ?)'
+    insert_submissions = """
+    INSERT OR IGNORE INTO submissions
+        (id, subreddit, title, submitter, discussion_url, url, punctuation, num_comments, created_date)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """
     db.cursor().executemany(insert_submissions, submissions)
     db.commit()
 
 def get_submission_by_id(id):
-    return db.cursor().execute("select * from submissions where id = ?;", (id,)).fetchall()
+    query = "SELECT * FROM submissions WHERE id = ?"
+    return db.cursor().execute(query, (id,)).fetchall()
 
 def get_submissions_by_submitter(submitter):
-    return db.cursor().execute("select * from submissions where submitter = ?;", (submitter,)).fetchall()
+    query = "SELECT * FROM submissions WHERE submitter = ?"
+    return db.cursor().execute(query, (submitter,)).fetchall()
 
 def get_submissions_commented_by_user(user):
-    return db.cursor().execute("select * from submissions where id in (select submission_id from comments where user = ?);", (user,)).fetchall()
+    query = """
+    SELECT * FROM submissions WHERE id IN
+        (SELECT submission_id FROM comments WHERE user = ?)
+    """
+    return db.cursor().execute(query, (user,)).fetchall()
 
 def get_submissions(type, order_by):
-    query = "select * from submissions"
+    query = "SELECT * FROM submissions"
 
     if type == "external":
-        query += " where url NOT LIKE 'https://www.reddit.com%'"
+        query += " WHERE url NOT LIKE 'https://www.reddit.com%'"
     elif type == "internal":
-        query += " where url LIKE 'https://www.reddit.com%'"
+        query += " WHERE url LIKE 'https://www.reddit.com%'"
 
-    query += " order by " + order_by + " desc limit 10;"
+    query += " ORDERY BY " + order_by + " DESC LIMIT 10;"
 
     return db.cursor().execute(query).fetchall()
 
 def save_submissions_comments(comments):
-    insert_comments = 'insert or ignore into comments(id, parent_id, submission_id, user, text, punctuation) values(?, ?, ?, ?, ?, ?)'
+    insert_comments = """
+    INSERT OR IGNORE INTO comments (id, parent_id, submission_id, user, text, punctuation)
+    VALUES (?, ?, ?, ?, ?, ?)
+    """
     db.cursor().executemany(insert_comments, comments)
     db.commit()
 
 # setting default to top 10
 def get_top_submitters(limit=10):
-    return db.cursor().execute("select submitter from submissions group by submitter order by count(*) desc limit ?;", (limit,)).fetchall()
+    query = "SELECT submitter FROM submissions GROUP BY submitter ORDER BY count(*) DESC LIMIT ?"
+    return db.cursor().execute(query, (limit,)).fetchall()
 
 # setting default to top 10
 def get_top_commenters(limit=10):
-    return db.cursor().execute("select user from comments group by user order by count(*) desc limit ?;", (limit,)).fetchall()
+    return db.cursor().execute("SELECT user FROM comments GROUP BY user ORDER BY COUNT(*) DESC LIMIT ?", (limit,)).fetchall()
 
 def save_users(users):
-    insert_users = 'insert or ignore into users(username, comment_karma, post_karma) values(?, ?, ?)'
+    insert_users = "INSERT OR IGNORE INTO users (username, comment_karma, post_karma) values (?, ?, ?)"
     db.cursor().executemany(insert_users, users)
     db.commit()
 
 def get_user_comment_karma(username):
-    return db.cursor().execute("select comment_karma from users where username=?", (username,)).fetchall()
+    return db.cursor().execute("SELECT comment_karma FROM users WHERE username=?", (username,)).fetchall()
 
 def get_most_valued_users():
-    return db.cursor().execute("select * from users order by comment_karma+post_karma desc limit 10;").fetchall()
+    return db.cursor().execute("SELECT * FROM users ORDER BY comment_karma+post_karma DESC LIMIT 10").fetchall()

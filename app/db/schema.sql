@@ -1,27 +1,32 @@
-create table if not exists submissions (
-  id text primary key,
-  title text not null,
-  submitter text not null,
-  discussion_url text,
-  url text not null,
-  punctuation integer not null,
-  num_comments integer not null,
-  created_date text not null
+-- DROP TABLE submissions;
+-- DROP TABLE comments;
+-- DROP TABLE users;
+
+CREATE TABLE IF NOT EXISTS submissions (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  subreddit TEXT NOT NULL,
+  submitter TEXT NOT NULL,
+  discussion_url TEXT,
+  url TEXT NOT NULL,
+  punctuation INTEGER NOT NULL,
+  num_comments INTEGER NOT NULL,
+  created_date TEXT NOT NULL
 );
 
-create table if not exists comments (
-    id text primary key,
-    parent_id text,
-    submission_id text,
-    user text not null,
-    text text not null,
-    punctuation integer not null,
+CREATE TABLE IF NOT EXISTS comments (
+    id TEXT PRIMARY KEY,
+    parent_id TEXT,
+    submission_id TEXT,
+    user TEXT NOT NULL,
+    TEXT TEXT NOT NULL,
+    punctuation INTEGER NOT NULL,
     FOREIGN KEY(submission_id) REFERENCES submissions(id),
     FOREIGN KEY(parent_id) REFERENCES comments(id)
 );
 
-create table if not exists users (
-    username text primary key,
-    comment_karma integer not null,
-    post_karma integer not null
+CREATE TABLE IF NOT EXISTS users (
+    username TEXT PRIMARY KEY,
+    comment_karma INTEGER NOT NULL,
+    post_karma INTEGER NOT NULL
 );

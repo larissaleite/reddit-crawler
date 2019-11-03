@@ -15,16 +15,22 @@ def get_subreddit_pages(subreddit, pages):
     all_submissions_comments = []
 
     next_page = str()
-    for page in range(0, pages):
-        next_page = get_submissions_subreddit("r/"+subreddit+"/.json?"+next_page, all_submissions, all_submissions_comments)
+    for page in range(pages):
+        print("Page %s of %s " % (page+1, pages))
+        next_page = get_submissions_subreddit(subreddit,
+                                              next_page,
+                                              all_submissions,
+                                              all_submissions_comments)
 
+    print("Getting users info...")
     all_users_info = get_all_users_info()
     db.save_users(all_users_info)
 
     db.save_submissions(all_submissions)
     db.save_submissions_comments(all_submissions_comments)
 
-def get_submissions_subreddit(url_params, all_submissions, all_submissions_comments):
+def get_submissions_subreddit(subreddit, next_page, all_submissions, all_submissions_comments):
+    url_params = "r/"+subreddit+"/.json?"+next_page
     data = request_reddit_data(url_params)['data']
 
     submissions = data['children']
@@ -41,7 +47,8 @@ def get_submissions_subreddit(url_params, all_submissions, all_submissions_comme
         num_comments = submission['num_comments']
         created_date = submission['created']
 
-        submission = (submission_id, title, submitter, discussion_url, url, punctuation, num_comments, created_date)
+        submission = (submission_id, subreddit, title, submitter, discussion_url,
+                      url, punctuation, num_comments, created_date)
 
         all_submissions.append(submission)
 
@@ -142,9 +149,11 @@ if __name__ == '__main__':
     db.create_schema_db()
 
     try:
-        pages = int(sys.argv[1])
+        subreddit = sys.argv[1]
+        pages = int(sys.argv[2])
+
         if pages < 0: raise ValueError
 
-        get_subreddit_pages('Python', pages)
+        get_subreddit_pages(subreddit, pages)
     except (IndexError, ValueError):
         print "A valid number of pages needs to be passed as parameter"
