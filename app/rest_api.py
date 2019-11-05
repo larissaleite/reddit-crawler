@@ -6,6 +6,22 @@ app = Flask (__name__)
 def status_400(message):
 	return json.dumps({ "status": "400", "message" : message }), 400
 
+@app.route('/api/tags', methods=['GET'])
+def get_tags():
+    username = request.args.get('username')
+    if username == '':
+        return status_400("Invalid username")
+    return json.dumps(db.get_tags(username))
+
+@app.route('/api/tags', methods=['PUT'])
+def put_tags():
+    username = request.args.get('username')
+    tag = request.args.get('tag')
+    if not username or not tag:
+        return status_400("Invalid username or tag")
+    db.put_tag(username, tag)
+    return ""
+
 @app.route('/api/submissions', methods=['GET'])
 def get_submissions():
 	type = request.args.get('type', None)

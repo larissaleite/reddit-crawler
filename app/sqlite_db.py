@@ -18,6 +18,19 @@ def save_submissions(submissions):
     db.cursor().executemany(insert_submissions, submissions)
     db.commit()
 
+def get_tags(username):
+    query = "SELECT id FROM tags WHERE username = ?"
+    return db.cursor().execute(query, (username,)).fetchall()
+
+def put_tag(username, tag):
+    query = "SELECT MAX(id) FROM tags"
+    max_ids = db.cursor().execute(query).fetchall()
+    max_id = 1 + (max_ids[0][0] or -1)
+
+    query = "INSERT INTO tags (username, tag, id) VALUES (?, ?, ?)"
+    db.cursor().execute(query, (username, tag, max_id))
+    db.commit()
+
 def get_submission_by_id(id):
     query = "SELECT * FROM submissions WHERE id = ?"
     return db.cursor().execute(query, (id,)).fetchall()

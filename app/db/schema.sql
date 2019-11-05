@@ -1,6 +1,7 @@
 -- DROP TABLE submissions;
 -- DROP TABLE comments;
 -- DROP TABLE users;
+-- DROP TABLE tags;
 
 CREATE TABLE IF NOT EXISTS submissions (
   id TEXT PRIMARY KEY,
@@ -29,4 +30,18 @@ CREATE TABLE IF NOT EXISTS users (
     username TEXT PRIMARY KEY,
     comment_karma INTEGER NOT NULL,
     post_karma INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS tags (
+    id INTEGER,
+    username TEXT NOT NULL,
+    tag TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS submissions_tags (
+    submission_id TEXT,
+    tag_id INTEGER REFERENCES tags (id),
+    FOREIGN KEY (submission_id) REFERENCES submissions (id),
+    FOREIGN KEY (tag_id) REFERENCES tags (id),
+    PRIMARY KEY (submission_id, tag_id)
 );
