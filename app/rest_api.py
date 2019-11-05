@@ -22,6 +22,15 @@ def put_tags():
     db.put_tag(username, tag)
     return ""
 
+@app.route('/api/tag_submission', methods=['PUT'])
+def put_tag_submission():
+    submission_id = request.args.get('submission_id')
+    tag_id = request.args.get('tag_id')
+    if not submission_id or not tag_id:
+        return status_400("Invalid submission or tag")
+    db.put_submission_tag(submission_id, tag_id)
+    return ""
+
 @app.route('/api/submissions', methods=['GET'])
 def get_submissions():
 	type = request.args.get('type', None)

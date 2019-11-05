@@ -25,10 +25,18 @@ def get_tags(username):
 def put_tag(username, tag):
     query = "SELECT MAX(id) FROM tags"
     max_ids = db.cursor().execute(query).fetchall()
-    max_id = 1 + (max_ids[0][0] or -1)
+    if max_ids[0][0] is None:
+        max_id = 0
+    else:
+        max_id = 1 + max_ids[0][0]
 
     query = "INSERT INTO tags (username, tag, id) VALUES (?, ?, ?)"
     db.cursor().execute(query, (username, tag, max_id))
+    db.commit()
+
+def put_submission_tag(submission_id, tag_id):
+    query = "INSERT INTO submissions_tags (submission_id, tag_id) VALUES (?, ?)"
+    db.cursor().execute(query, (submission_id, tag_id))
     db.commit()
 
 def get_submission_by_id(id):
