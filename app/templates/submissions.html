@@ -1,0 +1,20 @@
+<table>
+  <tr>
+    <th>Title</th>
+    <th>Subreddit</th>
+    <th>Tags</th>
+    <th>Add tags</th>
+  </tr>
+  {% for item in submissions %}
+  <form method="POST" action="/api/tags?submission_id={{ item[0] }}">
+  <tr>
+    <td><a href="{{ item[3] }}">{{ item[1] }}</a></td>
+    <td>{{ item[2] }}</td>
+    <td>{{ item[4] }}</td>
+    <td><input name="tag" placeholder="Tag"/><input name="username" placeholder="Username"/><button type="submit">Add</button>
+    <td><small>DEBUG: {{ item }}</small></td>
+  </tr>
+  </form>
+  {% endfor %}
+</table>
+

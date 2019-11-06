@@ -1,5 +1,5 @@
 import sqlite_db as db, json
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template, redirect
 
 app = Flask (__name__)
 
@@ -13,19 +13,23 @@ def get_tags():
         return status_400("Invalid username")
     return json.dumps(db.get_tags(username))
 
-@app.route('/api/tags', methods=['PUT'])
+@app.route('/api/tags', methods=['POST'])
 def put_tags():
-    username = request.args.get('username')
-    tag = request.args.get('tag')
+    username = request.form.get('username')
+    tag = request.form.get('tag')
     if not username or not tag:
         return status_400("Invalid username or tag")
-    db.put_tag(username, tag)
-    return ""
+    tag_id = db.put_tag(username, tag)
+    submission_id = request.args.get('submission_id')
+    if submission_id:
+        put_tag_submission(submission_id, tag_id)
+    return redirect("/api/submissions?order_by=num_comments")
 
 @app.route('/api/tag_submission', methods=['PUT'])
-def put_tag_submission():
-    submission_id = request.args.get('submission_id')
-    tag_id = request.args.get('tag_id')
+def put_tag_submission(submission_id=None, tag_id=None):
+    if not submission_id or not tag_id:
+        submission_id = request.args.get('submission_id')
+        tag_id = request.args.get('tag_id')
     if not submission_id or not tag_id:
         return status_400("Invalid submission or tag")
     db.put_submission_tag(submission_id, tag_id)
@@ -41,7 +45,7 @@ def get_submissions():
 		if order_by != 'num_comments' and order_by != 'punctuation':
 			return status_400("Invalid value for parameter: order_by. Valid values: num_comments, punctuation")
 
-		return json.dumps(db.get_submissions(type, order_by))
+		return render_template("submissions.html", submissions=db.get_submissions(type, order_by))
 	else:
 		return status_400("Parameter required: order_by")
 
@@ -71,4 +75,4 @@ def get_submissions_commented_by_user(username):
 if __name__ == "__main__":
 	db.create_schema_db()
 
-	app.run()
+	app.run(host='10.65.134.89', port=8000)

@@ -152,6 +152,8 @@ if __name__ == '__main__':
         subreddit = sys.argv[1]
         pages = int(sys.argv[2])
 
+        print "Browsing", subreddit, "for", pages, "pages"
+
         if pages < 0: raise ValueError
 
         get_subreddit_pages(subreddit, pages)

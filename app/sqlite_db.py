@@ -33,6 +33,7 @@ def put_tag(username, tag):
     query = "INSERT INTO tags (username, tag, id) VALUES (?, ?, ?)"
     db.cursor().execute(query, (username, tag, max_id))
     db.commit()
+    return max_id
 
 def put_submission_tag(submission_id, tag_id):
     query = "INSERT INTO submissions_tags (submission_id, tag_id) VALUES (?, ?)"
@@ -55,14 +56,19 @@ def get_submissions_commented_by_user(user):
     return db.cursor().execute(query, (user,)).fetchall()
 
 def get_submissions(type, order_by):
-    query = "SELECT * FROM submissions"
+    query = """
+    SELECT s.id, s.title, s.subreddit, s.url,GROUP_CONCAT(at.all_tags)
+    FROM submissions s
+    LEFT JOIN submissions_tags st ON (st.submission_id = s.id)
+    LEFT JOIN (SELECT t.id, t.tag all_tags FROM tags t) at ON (st.tag_id = at.id) GROUP BY s.id
+    """
 
     if type == "external":
         query += " WHERE url NOT LIKE 'https://www.reddit.com%'"
     elif type == "internal":
         query += " WHERE url LIKE 'https://www.reddit.com%'"
 
-    query += " ORDERY BY " + order_by + " DESC LIMIT 10;"
+    query += " ORDER BY " + order_by + " DESC LIMIT 10;"
 
     return db.cursor().execute(query).fetchall()
 
