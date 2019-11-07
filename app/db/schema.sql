@@ -35,7 +35,8 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS tags (
     id INTEGER,
     username TEXT NOT NULL,
-    tag TEXT NOT NULL
+    tag TEXT NOT NULL,
+    CONSTRAINT unique_username_tag UNIQUE (username, tag)
 );
 
 CREATE TABLE IF NOT EXISTS submissions_tags (
