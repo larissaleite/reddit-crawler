@@ -23,7 +23,7 @@ def put_tags():
     submission_id = request.args.get('submission_id')
     if submission_id:
         put_tag_submission(submission_id, tag_id)
-    return redirect("/api/submissions?order_by=num_comments")
+    return redirect("/api/submissions?order_by=created_date")
 
 @app.route('/api/tag_submission', methods=['PUT'])
 def put_tag_submission(submission_id=None, tag_id=None):
@@ -37,17 +37,18 @@ def put_tag_submission(submission_id=None, tag_id=None):
 
 @app.route('/api/submissions', methods=['GET'])
 def get_submissions():
-	type = request.args.get('type', None)
+    type = request.args.get('type', None)
+    valid_args = ('num_comments', 'created_date', 'punctuation')
 
-	if 'order_by' in request.args:
-		order_by = request.args.get('order_by')
+    if 'order_by' in request.args:
+        order_by = request.args.get('order_by')
 
-		if order_by != 'num_comments' and order_by != 'punctuation':
-			return status_400("Invalid value for parameter: order_by. Valid values: num_comments, punctuation")
+        if order_by not in valid_args:
+            return status_400("Invalid value for parameter: order_by. Valid values: num_comments, punctuation")
 
-		return render_template("submissions.html", submissions=db.get_submissions(type, order_by))
-	else:
-		return status_400("Parameter required: order_by")
+        return render_template("submissions.html", submissions=db.get_submissions(type, order_by))
+    else:
+        return status_400("Parameter required: order_by")
 
 @app.route('/api/users', methods=['GET'])
 def get_users():
