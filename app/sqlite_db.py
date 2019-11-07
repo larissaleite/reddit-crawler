@@ -23,6 +23,10 @@ def get_tags(username):
     return db.cursor().execute(query, (username,)).fetchall()
 
 def put_tag(username, tag):
+    query = "SELECT id FROM tags WHERE username = ? AND tag = ?"
+    tag_id = db.cursor().execute(query, (username, tag)).fetchall()
+    if tag_id and tag_id[0] and tag_id[0][0] is not None:
+        return tag_id[0][0]
     query = "SELECT MAX(id) FROM tags"
     max_ids = db.cursor().execute(query).fetchall()
     if max_ids[0][0] is None:
