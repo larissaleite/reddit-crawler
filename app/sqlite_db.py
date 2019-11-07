@@ -64,16 +64,17 @@ def get_submissions(type, order_by):
     SELECT s.id, s.title, s.subreddit, s.url,GROUP_CONCAT(at.all_tags)
     FROM submissions s
     LEFT JOIN submissions_tags st ON (st.submission_id = s.id)
-    LEFT JOIN (SELECT t.id, t.tag all_tags FROM tags t) at ON (st.tag_id = at.id) GROUP BY s.id
+    LEFT JOIN (SELECT t.id, t.tag all_tags FROM tags t) at ON (st.tag_id = at.id)
     """
 
     if type == "external":
         query += " WHERE url NOT LIKE 'https://www.reddit.com%'"
     elif type == "internal":
         query += " WHERE url LIKE 'https://www.reddit.com%'"
+    query += " WHERE s.url LIKE '%gfycat%'"
 
-    query += " ORDER BY " + order_by + " DESC LIMIT 10;"
-
+    query += " GROUP BY s.id  ORDER BY " + order_by + " DESC LIMIT 50;"
+    print query
     return db.cursor().execute(query).fetchall()
 
 def save_submissions_comments(comments):
