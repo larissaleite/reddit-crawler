@@ -1,10 +1,16 @@
 import sqlite_db as db, json
-from flask import Flask, jsonify, request, render_template, redirect
+from flask import Flask, jsonify, request, render_template, redirect, send_from_directory
 
 app = Flask (__name__)
 
 def status_400(message):
 	return json.dumps({ "status": "400", "message" : message }), 400
+
+@app.route('/favicon.ico', methods=['GET'])
+def favicon():
+    return send_from_directory('/home/quiver/reddit-crawler',
+                               'favicon.png',
+                               mimetype='image/vnd.microsoft.icon')
 
 @app.route('/api/tags', methods=['GET'])
 def get_tags():
