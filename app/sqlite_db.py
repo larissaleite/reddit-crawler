@@ -71,7 +71,7 @@ def get_submissions(type, order_by):
         query += " WHERE url NOT LIKE 'https://www.reddit.com%'"
     elif type == "internal":
         query += " WHERE url LIKE 'https://www.reddit.com%'"
-    query += " WHERE s.url LIKE '%gfycat%'"
+    query += " WHERE s.url LIKE '%gfycat%' OR s.url LIKE '%imgur%'"
 
     query += " GROUP BY s.id  ORDER BY " + order_by + " DESC LIMIT 50;"
     print query
