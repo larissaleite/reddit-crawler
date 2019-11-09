@@ -46,13 +46,17 @@ def get_submissions():
     type = request.args.get('type', None)
     valid_args = ('num_comments', 'created_date', 'punctuation')
 
+    filter_by = None
+    if 'filter_by' in request.args:
+        filter_by = request.args.get('filter_by')
+
     if 'order_by' in request.args:
         order_by = request.args.get('order_by')
 
         if order_by not in valid_args:
             return status_400("Invalid value for parameter: order_by. Valid values: num_comments, punctuation")
 
-        return render_template("submissions.html", submissions=db.get_submissions(type, order_by))
+        return render_template("submissions.html", submissions=db.get_submissions(type, order_by, filter_by))
     else:
         return status_400("Parameter required: order_by")
 

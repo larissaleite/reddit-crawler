@@ -59,7 +59,7 @@ def get_submissions_commented_by_user(user):
     """
     return db.cursor().execute(query, (user,)).fetchall()
 
-def get_submissions(type, order_by):
+def get_submissions(type, order_by, filter_by):
     query = """
     SELECT s.id, s.title, s.subreddit, s.url,GROUP_CONCAT(at.all_tags)
     FROM submissions s
@@ -71,9 +71,13 @@ def get_submissions(type, order_by):
         query += " WHERE url NOT LIKE 'https://www.reddit.com%'"
     elif type == "internal":
         query += " WHERE url LIKE 'https://www.reddit.com%'"
-    query += " WHERE s.url LIKE '%gfycat%' OR s.url LIKE '%imgur%'"
+    query += " WHERE (s.url LIKE '%gfycat%' OR s.url LIKE '%imgur%')"
 
-    query += " GROUP BY s.id  ORDER BY " + order_by + " DESC LIMIT 50;"
+    query += " GROUP BY s.id"
+    if filter_by is not None:
+        filter_by = filter_by.replace(';', '')[:30]  # "sanitise"
+        query += " HAVING SUM(CASE WHEN at.all_tags = 'omg' THEN 1 ELSE 0 END) > 0"
+    query += " ORDER BY " + order_by + " DESC LIMIT 50;"
     print query
     return db.cursor().execute(query).fetchall()
 
