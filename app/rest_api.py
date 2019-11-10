@@ -58,7 +58,7 @@ def get_submissions():
 
         return render_template("submissions.html", submissions=db.get_submissions(type, order_by, filter_by))
     else:
-        return status_400("Parameter required: order_by")
+        return render_template("submissions.html", submissions=db.get_submissions(type, 'RANDOM()', filter_by))
 
 @app.route('/api/users', methods=['GET'])
 def get_users():
