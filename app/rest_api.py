@@ -29,7 +29,7 @@ def put_tags():
     submission_id = request.args.get('submission_id')
     if submission_id:
         put_tag_submission(submission_id, tag_id)
-    return redirect("/api/submissions?order_by=created_date")
+    return redirect("/api/submissions")
 
 @app.route('/api/tag_submission', methods=['PUT'])
 def put_tag_submission(submission_id=None, tag_id=None):
