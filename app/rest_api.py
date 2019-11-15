@@ -60,6 +60,12 @@ def get_submissions():
     else:
         return render_template("submissions.html", submissions=db.get_submissions(type, 'RANDOM()', filter_by))
 
+@app.route('/api/search', methods=['GET'])
+def get_search_results():
+    search_term = request.args.get('search_term')
+    print(search_term)
+    return render_template("submissions.html", submissions=db.get_submissions(None, 'RANDOM()', None, search_term))
+
 @app.route('/api/users', methods=['GET'])
 def get_users():
 	if 'order_by' in request.args:
@@ -87,3 +93,4 @@ if __name__ == "__main__":
 	db.create_schema_db()
 
 	app.run(host='10.65.134.89', port=8000)
+	#app.run(host='127.0.0.1', port=8000)

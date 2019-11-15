@@ -59,13 +59,18 @@ def get_submissions_commented_by_user(user):
     """
     return db.cursor().execute(query, (user,)).fetchall()
 
-def get_submissions(type, order_by, filter_by):
+def get_submissions(type, order_by, filter_by, search_term=None):
     query = """
     SELECT s.id, s.title, s.subreddit, s.url,GROUP_CONCAT(at.all_tags)
     FROM submissions s
     LEFT JOIN submissions_tags st ON (st.submission_id = s.id)
     LEFT JOIN (SELECT t.id, t.tag all_tags FROM tags t) at ON (st.tag_id = at.id)
     """
+    
+    if search_term is not None:
+        search_term = '%'+search_term+'%'
+
+    query_params = tuple(param for param in [filter_by, search_term] if param is not None)
 
     if type == "external":
         query += " WHERE url NOT LIKE 'https://www.reddit.com%'"
@@ -73,13 +78,16 @@ def get_submissions(type, order_by, filter_by):
         query += " WHERE url LIKE 'https://www.reddit.com%'"
     query += " WHERE (s.url LIKE '%gfycat%' OR s.url LIKE '%imgur%')"
 
+    if search_term is not None:
+        query += " AND title LIKE ?" 
+
     query += " GROUP BY s.id"
     if filter_by is not None:
-        filter_by = filter_by.replace(';', '')[:30]  # "sanitise"
-        query += " HAVING SUM(CASE WHEN at.all_tags = 'omg' THEN 1 ELSE 0 END) > 0"
+        #filter_by = filter_by.replace(';', '')[:30]  # "sanitise"
+        query += " HAVING SUM(CASE WHEN at.all_tags = ? THEN 1 ELSE 0 END) > 0"
+    
     query += " ORDER BY " + order_by + " DESC LIMIT 50;"
-    print query
-    return db.cursor().execute(query).fetchall()
+    return db.cursor().execute(query, query_params).fetchall()
 
 def save_submissions_comments(comments):
     insert_comments = """

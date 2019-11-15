@@ -5,6 +5,9 @@
     <th>Tags</th>
     <th>Add tags</th>
   </tr>
+  <form method="GET" action="/api/search">
+  	<input name="search_term" placeholder="Search term" /><button type="submit">Search</button>
+  </form>
   {% for item in submissions %}
   <form method="POST" action="/api/tags?submission_id={{ item[0] }}">
   <tr>
