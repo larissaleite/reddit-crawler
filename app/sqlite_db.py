@@ -64,7 +64,7 @@ def get_submissions(type, order_by, filter_by, search_term=None):
     SELECT s.id, s.title, s.subreddit, s.url,GROUP_CONCAT(at.all_tags)
     FROM submissions s
     LEFT JOIN submissions_tags st ON (st.submission_id = s.id)
-    LEFT JOIN (SELECT t.id, t.tag all_tags FROM tags t) at ON (st.tag_id = at.id)
+    LEFT JOIN (SELECT t.id, t.tag all_tags FROM tags t WHERE t.tag <> 'not-found') at ON (st.tag_id = at.id)
     """
     
     if search_term is not None:
