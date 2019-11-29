@@ -92,5 +92,7 @@ def get_submissions_commented_by_user(username):
 if __name__ == "__main__":
 	db.create_schema_db()
 
-	app.run(host='10.65.134.89', port=8000)
-	#app.run(host='127.0.0.1', port=8000)
+# This one for accessing by IP
+	#app.run(host='10.65.134.89', port=8000)
+# This one for connecting through nginx and https
+	app.run(host='127.0.0.1', port=8000)
