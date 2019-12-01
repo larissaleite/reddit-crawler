@@ -1,23 +1,27 @@
-<table>
-  <tr>
-    <th>Title</th>
-    <th>Subreddit</th>
-    <th>Tags</th>
-    <th>Add tags</th>
-  </tr>
-  <form method="GET" action="/api/search">
-  	<input name="search_term" placeholder="Search term" /><button type="submit">Search</button>
-  </form>
-  {% for item in submissions %}
-  <form method="POST" action="/api/tags?submission_id={{ item[0] }}">
-  <tr>
-    <td><a href="{{ item[3] }}">{{ item[1] }}</a></td>
-    <td>{{ item[2] }}</td>
-    <td>{{ item[4] }}</td>
-    <td><input name="tag" placeholder="Tag"/><input name="username" placeholder="Username"/><button type="submit">Add</button>
-    <td><small>DEBUG: {{ item }}</small></td>
-  </tr>
-  </form>
-  {% endfor %}
-</table>
-
+<body style="background-color: rgb(69, 81, 102); color: rgb(184, 199, 224);">
+  <table>
+    <tr>
+      <th>Title</th>
+      <th>Subreddit</th>
+      <th>Tags</th>
+      <th>Add tags</th>
+    </tr>
+    <form method="GET" action="/api/search">
+      <input name="search_term" placeholder="Search term" style="background-color: rgb(69, 81, 102); color: rgb(184, 199, 224)" /><button type="submit">Search</button>
+    </form>
+    {% for item in submissions %}
+    <form method="POST" action="/api/tags?submission_id={{ item[0] }}">
+    <tr>
+      <td><a href="{{ item[3] }}" style="color: rgb(184, 199, 224);">{{ item[1] }}</a></td>
+      <td>{{ item[2] }}</td>
+      <td>{{ item[4] }}</td>
+      <td>
+        <input name="tag" placeholder="Tag" style="background-color: rgb(69, 81, 102); color: rgb(184, 199, 224)"/>
+        <input name="username" placeholder="Username" style="background-color: rgb(69, 81, 102); color: rgb(184, 199, 224)"/>
+        <button type="submit">Add</button>
+      <td><small>DEBUG: {{ item }}</small></td>
+    </tr>
+    </form>
+    {% endfor %}
+  </table>
+</body>
