@@ -61,10 +61,10 @@ def get_submissions_commented_by_user(user):
 
 def get_submissions(type, order_by, filter_by, search_term=None):
     query = """
-    SELECT s.id, s.title, s.subreddit, s.url,GROUP_CONCAT(at.all_tags)
+    SELECT GROUP_CONCAT(s.id), GROUP_CONCAT(s.title), GROUP_CONCAT(s.subreddit), s.url, GROUP_CONCAT(t.tag)
     FROM submissions s
     LEFT JOIN submissions_tags st ON (st.submission_id = s.id)
-    LEFT JOIN (SELECT t.id, t.tag all_tags FROM tags t WHERE t.tag <> 'not-found') at ON (st.tag_id = at.id)
+    LEFT JOIN tags t ON (st.tag_id = t.id)
     """
     
     if search_term is not None:
@@ -77,14 +77,21 @@ def get_submissions(type, order_by, filter_by, search_term=None):
     elif type == "internal":
         query += " WHERE url LIKE 'https://www.reddit.com%'"
     query += " WHERE (s.url LIKE '%gfycat%' OR s.url LIKE '%imgur%')"
-
-    if search_term is not None:
-        query += " AND title LIKE ?" 
+    query += """ AND s.id NOT IN (
+    SELECT s.id
+      FROM submissions s
+           JOIN submissions_tags st ON (s.id = st.submission_id)
+           JOIN tags t ON (st.tag_id = t.id)
+     WHERE t.tag = 'not-found'
+     )"""
 
     query += " GROUP BY s.id"
+    if search_term is not None:
+        query += " HAVING GROUP_CONCAT(s.title) LIKE ?"
+
     if filter_by is not None:
         #filter_by = filter_by.replace(';', '')[:30]  # "sanitise"
-        query += " HAVING SUM(CASE WHEN at.all_tags = ? THEN 1 ELSE 0 END) > 0"
+        query += " HAVING SUM(CASE WHEN t.tag = ? THEN 1 ELSE 0 END) > 0"
     
     query += " ORDER BY " + order_by + " DESC LIMIT 50;"
     return db.cursor().execute(query, query_params).fetchall()
