@@ -5,6 +5,7 @@
       <th>Subreddit</th>
       <th>Tags</th>
       <th>Add tags</th>
+      <th>Comments</th>
     </tr>
     <form method="GET" action="/api/search">
       <input name="search_term" placeholder="Search term" style="background-color: rgb(69, 81, 102); color: rgb(184, 199, 224)" /><button type="submit">Search</button>
@@ -19,6 +20,8 @@
         <input name="tag" placeholder="Tag" style="background-color: rgb(69, 81, 102); color: rgb(184, 199, 224)"/>
         <input name="username" placeholder="Username" style="background-color: rgb(69, 81, 102); color: rgb(184, 199, 224)"/>
         <button type="submit">Add</button>
+      </td>
+      <td><a href="https://reddit.com/r/{{ item[2] }}/comments/{{ item[0] }}">comments</a></td>
       <td><small>DEBUG: {{ item }}</small></td>
     </tr>
     </form>
