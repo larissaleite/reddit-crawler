@@ -41,6 +41,7 @@ def put_tag(username, tag):
 
 def put_submission_tag(submission_id, tag_id):
     query = "INSERT INTO submissions_tags (submission_id, tag_id) VALUES (?, ?)"
+    print "Tagging", submission_id, "with", tag_id
     db.cursor().execute(query, (submission_id, tag_id))
     db.commit()
 
@@ -59,7 +60,7 @@ def get_submissions_commented_by_user(user):
     """
     return db.cursor().execute(query, (user,)).fetchall()
 
-def get_submissions(type, order_by, filter_by, search_term=None):
+def get_submissions(type, order_by, filter_by, search_term=None, only_sub=[]):
     query = """
     SELECT GROUP_CONCAT(s.id), GROUP_CONCAT(s.title), GROUP_CONCAT(s.subreddit), s.url, GROUP_CONCAT(t.tag)
     FROM submissions s
@@ -84,6 +85,9 @@ def get_submissions(type, order_by, filter_by, search_term=None):
            JOIN tags t ON (st.tag_id = t.id)
      WHERE t.tag = 'not-found'
      )"""
+    if only_sub:
+        query += " AND s.subreddit IN (" + ','.join(["'" + x + "'" for x in only_sub]) + ')'
+        print query
 
     query += " GROUP BY s.id"
     if search_term is not None:

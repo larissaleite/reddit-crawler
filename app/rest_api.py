@@ -46,6 +46,10 @@ def get_submissions():
     type = request.args.get('type', None)
     valid_args = ('num_comments', 'created_date', 'punctuation')
 
+    only_sub = []
+    if 'only_sub' in request.args:
+        only_sub = request.args.get('only_sub').split(',') 
+
     filter_by = None
     if 'filter_by' in request.args:
         filter_by = request.args.get('filter_by')
@@ -56,9 +60,9 @@ def get_submissions():
         if order_by not in valid_args:
             return status_400("Invalid value for parameter: order_by. Valid values: num_comments, punctuation")
 
-        return render_template("submissions.html", submissions=db.get_submissions(type, order_by, filter_by))
+        return render_template("submissions.html", submissions=db.get_submissions(type, order_by, filter_by, None, only_sub))
     else:
-        return render_template("submissions.html", submissions=db.get_submissions(type, 'RANDOM()', filter_by))
+        return render_template("submissions.html", submissions=db.get_submissions(type, 'RANDOM()', filter_by, None, only_sub))
 
 @app.route('/api/search', methods=['GET'])
 def get_search_results():
